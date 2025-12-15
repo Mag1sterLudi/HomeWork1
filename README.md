@@ -83,7 +83,7 @@
 
 - Build and Test (windows-latest, python=3.10) — 38s
 
-
 Если тесты упали — проверьте логи для конкретной ОС/версии Python.
 
+SF и MIFI, спасибо за внимание!
 
