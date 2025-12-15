@@ -1,0 +1,57 @@
+# Название пайплайна
+name: Python CI with pytest
+
+
+# Триггеры запуска пайплайна
+on:
+  # Запускать при push в ветку main
+  push:
+    branches: [ main ]
+  # Запускать при создании/обновлении пулл реквест (PR) в ветку main
+  pull_request:
+    branches: [ main ]
+
+# Описание задач (jobs) пайплайна
+jobs:
+  # Имя задачи: сборка и тестирование
+  build-and-test:
+    # Читаемое название задачи (в интерфейсе GitHub)
+    name: Build and Test
+    # Окружение для выполнения (берётся из матрицы ниже)
+    runs-on: ${{ matrix.os }}
+
+    # Параллельные сборки для разных конфигураций
+    strategy:
+      matrix:
+        # Список ОС для тестирования
+        os: [ ubuntu-latest, windows-latest, macos-latest ]
+        # Список версий Python для тестирования
+        python-version: [ '3.9', '3.10', '3.11' ]
+
+    # Шаги выполнения задачи
+    steps:
+      # Шаг 1: Клонировать репозиторий на агент GitHub Actions
+      - name: Checkout repository
+        uses: actions/checkout@v4  # Используем официальный Action для клонирования
+
+      # Шаг 2: Установить нужную версию Python
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5  # Официальный Action для настройки Python
+        with:
+          # Передаём версию Python из матрицы
+          python-version: ${{ matrix.python-version }}
+
+      # Шаг 3: Установить зависимости из requirements.txt
+      - name: Install dependencies
+        # Выполняем команды в оболочке
+        run: |
+          # Обновить pip до последней версии
+          python -m pip install --upgrade pip
+          # Установить пакеты из requirements.txt
+          pip install -r requirements.txt
+
+      # Шаг 4: Запустить тесты через pytest
+      - name: Run tests with pytest
+        # -v: подробный вывод результатов
+        run: pytest -v
+
